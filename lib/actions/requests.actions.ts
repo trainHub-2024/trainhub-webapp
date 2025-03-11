@@ -1,0 +1,83 @@
+import { AdminRequest } from "@/types/appwrite.types";
+import { databases } from "../appwrite";
+import { parseStringify } from "../utils";
+import { toast } from "sonner";
+import { getProfileById, updateProfileById } from "./profile.actions";
+
+export async function getAdminRequests(): Promise<AdminRequest[]> {
+  try {
+    const data = await databases.listDocuments(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_ADMIN_REQUEST_COLLECTION_ID!
+    );
+
+    if (!data?.documents) {
+      return [];
+    }
+
+    // Fetch trainer profiles for requests that have trainerProfile_id
+    const adminRequests = await Promise.all(
+      data.documents.map(async (request) => {
+        if (request.trainerProfile_id) {
+          const trainerProfile = await getProfileById({
+            id: request.trainerProfile_id,
+            role: "trainer",
+          });
+
+          return {
+            ...parseStringify(request),
+            trainerProfile,
+          };
+        }
+
+        return parseStringify(request);
+      })
+    );
+
+    return adminRequests;
+  } catch (error) {
+    const errorMessage =
+      "An error occurred while retrieving the admin requests details:";
+    toast.error(errorMessage);
+    console.error(errorMessage, error);
+    return [];
+  }
+}
+
+export async function updateAdminRequestStatus({
+  id,
+  status,
+  trainer_id,
+}: {
+  id: string;
+  trainer_id: string;
+  status: "denied" | "completed";
+}): Promise<AdminRequest | null> {
+  try {
+    const data = await databases.updateDocument(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_ADMIN_REQUEST_COLLECTION_ID!,
+      id,
+      {
+        status,
+      }
+    );
+
+    if (status === "completed")
+      await updateProfileById({
+        id: trainer_id,
+        role: "trainer",
+        body: {
+          isCertified: true,
+        },
+      });
+
+    return parseStringify(data);
+  } catch (error) {
+    const errorMessage =
+      "An error occurred while updating admin request details:";
+    toast.error(errorMessage);
+    console.error(errorMessage, error);
+    return null;
+  }
+}
