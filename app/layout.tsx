@@ -17,7 +17,7 @@ const APP_NAME = process.env.APP_NAME;
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: "Created by Kielo Mercado",
+  description: "Created for Thesis",
 };
 
 export default async function RootLayout({
@@ -31,20 +31,18 @@ export default async function RootLayout({
       <body
         className={`${poppins.variable} antialiased`}
       >
-        <GlobalProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Toaster />
-            <main className="w-full relative min-h-screen">
-              {children}
-            </main>
-            <ThemeToggle />
-          </ThemeProvider>
-        </GlobalProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster />
+          <main className="w-full relative min-h-screen">
+            {children}
+          </main>
+          <ThemeToggle />
+        </ThemeProvider>
       </body>
     </html>
   );

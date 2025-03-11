@@ -33,7 +33,7 @@ export function LoginForm({
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
 
-    const { isLogged } = useGlobalContext();
+    // const { isLogged } = useGlobalContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -68,9 +68,9 @@ export function LoginForm({
         }
     }
 
-    if (isLogged) {
-        window.location.replace("/dashboard");
-    }
+    // if (isLogged) {
+    //     window.location.replace("/dashboard");
+    // }
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>

@@ -1,11 +1,14 @@
 import AdminLayout from '@/components/layouts/AdminLayout'
+import GlobalProvider from '@/providers/global-provider'
 import React from 'react'
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <AdminLayout>
-            {children}
-        </AdminLayout>
+        <GlobalProvider>
+            <AdminLayout>
+                {children}
+            </AdminLayout>
+        </GlobalProvider>
     )
 }
 
