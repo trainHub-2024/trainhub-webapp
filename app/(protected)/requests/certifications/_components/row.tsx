@@ -30,7 +30,7 @@ const Row = ({ data, refetch }: { data: AdminRequest; refetch: (newParams: any) 
     async function handleChangeStatus(newStatus: "denied" | "completed") {
         setIsLoading(true)
         try {
-            const res = await updateAdminRequestStatus({ id: data.$id, status: newStatus, trainer_id: data.trainerProfile_id })
+            const res = await updateAdminRequestStatus({ id: data.$id, status: newStatus, trainer_id: data.trainerProfile_id, type: data.type })
 
             if (res) {
                 toast("Updated successfully")
@@ -51,22 +51,27 @@ const Row = ({ data, refetch }: { data: AdminRequest; refetch: (newParams: any) 
             <TableCell className="font-medium text-center">
                 <RequestStatusDisplay status={data.status} />
             </TableCell>
-            <TableCell>
-
+            <TableCell className='text-center'>
+                {data?.text}
+            </TableCell>
+            <TableCell className='uppercase text-center'>
+                {data.type}
             </TableCell>
             <TableCell>
-                <div className="flex justify-center items-center">
-                    <div className="size-48 border relative rounded-lg overflow-hidden">
-                        <a href={data.certification ?? ""} target="_blank" rel="noopener noreferrer">
-                            <Image
-                                alt="certificate"
-                                src={data.certification ?? ""}
-                                fill
-                                className="object-center object-contain"
-                            />
-                        </a>
+                {data?.certification && (
+                    <div className="flex justify-center items-center">
+                        <div className="size-48 border relative rounded-lg overflow-hidden">
+                            <a href={data.certification ?? ""} target="_blank" rel="noopener noreferrer">
+                                <Image
+                                    alt="certificate"
+                                    src={data.certification ?? ""}
+                                    fill
+                                    className="object-center object-contain"
+                                />
+                            </a>
+                        </div>
                     </div>
-                </div>
+                )}
             </TableCell>
             <TableCell >
                 {data.status === "pending" && (

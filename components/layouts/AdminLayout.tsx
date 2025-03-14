@@ -50,7 +50,7 @@ const AdminLayout = ({ children }: ILayoutProps) => {
                 isActive: pathname.includes("/requests"),
                 items: [
                     {
-                        title: "Certifications",
+                        title: "trainers",
                         url: "/requests/certifications"
                     },
                 ],

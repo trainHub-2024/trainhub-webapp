@@ -32,6 +32,7 @@ const CertificationsPage = () => {
                                 <TableHead className="w-[220px]">Name</TableHead>
                                 <TableHead className="w-[60px] text-center">Status</TableHead>
                                 <TableHead className="text-center">Message</TableHead>
+                                <TableHead className='text-center'>Type</TableHead>
                                 <TableHead className='text-center'>Certificate</TableHead>
                                 <TableHead className="text-right"></TableHead>
                             </TableRow>

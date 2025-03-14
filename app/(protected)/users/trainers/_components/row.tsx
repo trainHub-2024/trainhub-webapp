@@ -78,11 +78,11 @@ const Row = ({ data, refetch }: { data: TrainerProfile; refetch: (newParams: Rec
                 </Link>
                 {data.isDisabled ?
                     <Button disabled={isLoading} type='button' onClick={() => updateStatusTrainer(false)} variant={"outline"}>
-                        Enable
+                        Unban
                     </Button>
                     :
                     <Button disabled={isLoading} type='button' onClick={() => updateStatusTrainer(true)} variant={"destructive"}>
-                        Disable
+                        Ban
                     </Button>
                 }
             </TableCell>

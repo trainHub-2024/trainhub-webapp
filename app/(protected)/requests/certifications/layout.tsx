@@ -5,13 +5,13 @@ import { Metadata } from 'next';
 import { APP_NAME } from '@/lib/utils';
 import AdminHeaderLayout from '@/components/layouts/AdminHeader';
 
-const TITLE = 'Requests Certifications';
-const DESCRIPTION = 'View and manage requests for approval of certificates in the system';
+const TITLE = 'Requests';
+const DESCRIPTION = 'View and manage requests for approval of certificates and notices in the system';
 const LIST = [
     {
         type: "page",
         href: "",
-        label: "Requests Certifications"
+        label: "Requests"
     },
 ]
 

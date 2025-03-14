@@ -85,7 +85,7 @@ export interface UserProfile extends Models.Document {
 
 export interface AdminRequest extends Models.Document {
   trainerProfile_id: string;
-  type: "certification" | "report";
+  type: "certification" | "report" | "appeal";
   certification: any;
   text: string;
   status: "pending" | "denied" | "completed";

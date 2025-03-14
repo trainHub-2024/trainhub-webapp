@@ -15,6 +15,8 @@ export async function getAdminRequests(): Promise<AdminRequest[]> {
       return [];
     }
 
+    console.log(data);
+
     // Fetch trainer profiles for requests that have trainerProfile_id
     const adminRequests = await Promise.all(
       data.documents.map(async (request) => {
@@ -48,10 +50,12 @@ export async function updateAdminRequestStatus({
   id,
   status,
   trainer_id,
+  type,
 }: {
   id: string;
   trainer_id: string;
   status: "denied" | "completed";
+  type: "certification" | "report" | "appeal";
 }): Promise<AdminRequest | null> {
   try {
     const data = await databases.updateDocument(
@@ -63,16 +67,29 @@ export async function updateAdminRequestStatus({
       }
     );
 
-    if (status === "completed")
-      await updateProfileById({
-        id: trainer_id,
-        role: "trainer",
-        body: {
-          isCertified: true,
-        },
-      });
+    if (type === "certification") {
+      if (status === "completed")
+        await updateProfileById({
+          id: trainer_id,
+          role: "trainer",
+          body: {
+            isCertified: true,
+          },
+        });
 
-    return parseStringify(data);
+      return parseStringify(data);
+    } else {
+      if (status === "completed")
+        await updateProfileById({
+          id: trainer_id,
+          role: "trainer",
+          body: {
+            isDisabled: false,
+          },
+        });
+
+      return parseStringify(data);
+    }
   } catch (error) {
     const errorMessage =
       "An error occurred while updating admin request details:";
