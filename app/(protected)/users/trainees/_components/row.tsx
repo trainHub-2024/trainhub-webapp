@@ -20,12 +20,12 @@ const Row = ({ data }: { data: UserProfile }) => {
 
             </TableCell>
             <TableCell className="flex flex-row justify-end items-center gap-2">
-                <Button>
+                {/* <Button>
                     View
                 </Button>
                 <Button variant={"destructive"}>
                     Disable
-                </Button>
+                </Button> */}
             </TableCell>
         </TableRow>
     )
