@@ -49,6 +49,27 @@ export async function getSportById({
   }
 }
 
+export async function deleteSportById({
+  id,
+}: {
+  id: string;
+}): Promise<Sport | null> {
+  try {
+    const data = await databases.deleteDocument(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      COLLECTION!,
+      id
+    );
+
+    return parseStringify(data);
+  } catch (error) {
+    const errorMessage = "An error occurred while deleting the sport details:";
+    toast.error(errorMessage);
+    console.error(errorMessage, error);
+    return null;
+  }
+}
+
 export async function updateSportById({
   id,
   body,
