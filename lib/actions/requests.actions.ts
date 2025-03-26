@@ -30,6 +30,16 @@ export async function getAdminRequests(): Promise<AdminRequest[]> {
             ...parseStringify(request),
             trainerProfile,
           };
+        } else if (request.userProfile_id) {
+          const userProfile = await getProfileById({
+            id: request.userProfile_id,
+            role: "trainee",
+          });
+
+          return {
+            ...parseStringify(request),
+            userProfile,
+          };
         }
 
         return parseStringify(request);
