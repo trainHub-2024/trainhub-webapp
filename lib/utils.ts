@@ -11,8 +11,9 @@ export const APP_NAME = process.env.APP_NAME!;
 
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
-export function formatTimeRange(startTime: Date, endTime: Date): string {
-  return `${format(startTime, "h:mm a")} - ${format(endTime, "h:mm a")}`;
+export function formatTimeRange(startTime?: Date, endTime?: Date): string {
+  if (!startTime || !endTime) return "";
+  else return `${format(startTime, "h:mm a")} - ${format(endTime, "h:mm a")}`;
 }
 
 export function computeTrainerIncome(data: Appointment) {

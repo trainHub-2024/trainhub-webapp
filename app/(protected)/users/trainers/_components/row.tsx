@@ -42,6 +42,8 @@ const Row = ({ data, refetch }: { data: TrainerProfile; refetch: (newParams: Rec
         }
     }
 
+    console.log(data.startTime)
+
     return (
         <TableRow>
             <TableCell className='capitalize'>{data.name}</TableCell>
@@ -54,7 +56,7 @@ const Row = ({ data, refetch }: { data: TrainerProfile; refetch: (newParams: Rec
             <TableCell>
                 <div className="flex flex-col gap-1 justify-center items-center">
                     <span className="text-sm font-bold text-primary">
-                        {formatTimeRange(data.startTime, data.endTime)}
+                        {formatTimeRange(data?.startTime, data?.endTime)}
                     </span>
                     <div className="space-x-1">
                         {data.workDays?.map((day) => (
