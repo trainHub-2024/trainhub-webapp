@@ -54,7 +54,7 @@ export function EditSportModal({
         <DialogHeader>
           <DialogTitle>Edit sport details</DialogTitle>
           <DialogDescription>
-            Make changes to the sport. Click save when you're done.
+            Make changes to the sport. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <form action="POST" className="space-y-4" onSubmit={handleSubmit}>
