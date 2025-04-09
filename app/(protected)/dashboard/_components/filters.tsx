@@ -60,7 +60,7 @@ export default function AnalyticsFilters() {
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal">
                                     <span>
-                                        {format(selectedDate.from, "MMM d, yyyy")} - {format(selectedDate.to, "MMM d, yyyy")}
+                                        {format(selectedDate?.from, "MMM d, yyyy")} - {format(selectedDate?.to, "MMM d, yyyy")}
                                     </span>
                                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>

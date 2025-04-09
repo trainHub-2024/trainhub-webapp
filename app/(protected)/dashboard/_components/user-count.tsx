@@ -128,7 +128,7 @@ export default function UserCountChart() {
                                         tickFormatter={(value) => value.toLocaleString()}
                                     />
                                     <ChartTooltip
-                                        content={<ChartTooltipContent formatValue={(value: any) => `${value.toLocaleString()} users`} />}
+                                        content={<ChartTooltipContent />}
                                     />
                                     <Bar dataKey="count" radius={[4, 4, 4, 4]} fill="var(--color-count)" barSize={20} fillOpacity={0.9} />
                                 </BarChart>

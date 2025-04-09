@@ -5,6 +5,11 @@ import { CheckCircle } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { useDashboardContext } from "../context"
+import useAppointments from "../hooks/use-appointments"
+import { useMemo } from "react"
+import { generateDateRange, groupByDate } from "../helpers"
+import { format } from "date-fns"
 
 // Sample completed session data
 const sessionData = [
@@ -18,15 +23,40 @@ const sessionData = [
 ]
 
 export default function CompletedSessionCountCard() {
-    // Calculate total completed sessions
-    const totalSessions = sessionData.reduce((sum, item) => sum + item.count, 0)
+    const { selectedDate } = useDashboardContext();
+    const appointments = useAppointments({ status: "completed", dateRange: selectedDate });
 
-    // Calculate week-over-week growth
-    const previousWeekTotal = 780
-    const growthPercentage = Math.round(((totalSessions - previousWeekTotal) / previousWeekTotal) * 100)
+    const { count, data: sessionData, maxSessionDate } = useMemo(() => {
+        if (appointments.isLoading || !appointments.data)
+            return { count: 0, data: [] }
+
+        const start = selectedDate.from;
+        const end = selectedDate.to;
+
+        const allDates = generateDateRange(start, end); // Generate all dates in range
+        const groupedData = groupByDate(appointments?.data ?? [], (d) => d.date);
+
+        const filledData = allDates.map((date) => {
+            const formattedDate = format(new Date(date), 'MM/dd');
+            const existing = groupedData.find(item => item.date === formattedDate);
+            return existing || { date: formattedDate, count: 0 }; // Default to 0 if not found
+        });
+
+        const maxSessionDate = filledData.reduce((max, current) => {
+            return current.count > max.count ? current : max; // Compare and return the object with the highest count
+        }, filledData[0]);
+
+        return {
+            count: appointments.data.length,
+            data: filledData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+            maxSessionDate
+        };
+
+    }, [appointments])
 
     // Calculate daily average
-    const dailyAverage = Math.round(totalSessions / sessionData.length)
+    const dailyAverage = Math.round(count / sessionData.length)
+
 
     return (
         <Card className="w-full">
@@ -46,10 +76,10 @@ export default function CompletedSessionCountCard() {
                     <div className="space-y-4">
                         <div>
                             <p className="text-sm text-muted-foreground">Total Completed</p>
-                            <p className="text-2xl font-bold">{totalSessions.toLocaleString()}</p>
+                            <p className="text-2xl font-bold">{count.toLocaleString()}</p>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
@@ -57,21 +87,22 @@ export default function CompletedSessionCountCard() {
                                 </div>
                                 <p className="text-sm font-medium">{dailyAverage.toLocaleString()}</p>
                             </div>
-
+                            {/* 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="h-3 w-3 rounded-full bg-emerald-300"></div>
                                     <p className="text-sm font-medium">Weekend Sessions</p>
                                 </div>
-                                <p className="text-sm font-medium">{(sessionData[5].count + sessionData[6].count).toLocaleString()}</p>
-                            </div>
+  
+                            </div> */}
 
-                            <div className="mt-2 rounded-md bg-muted p-2">
-                                <p className="text-xs text-muted-foreground">
-                                    {growthPercentage > 0 ? "+" : ""}
-                                    {growthPercentage}% week-over-week growth with highest completion on Sunday
-                                </p>
-                            </div>
+                            {maxSessionDate && (
+                                <div className="mt-2 rounded-md bg-muted p-2">
+                                    <p className="text-xs text-muted-foreground">
+                                        At {maxSessionDate.date} had the highest completion of {maxSessionDate.count} completions
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -79,7 +110,7 @@ export default function CompletedSessionCountCard() {
                         <ChartContainer
                             config={{
                                 completed: {
-                                    label: "Completed Sessions",
+                                    label: "Completed",
                                     color: "hsl(142, 76%, 36%)",
                                 },
                             }}
@@ -96,22 +127,30 @@ export default function CompletedSessionCountCard() {
                                 >
                                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
                                     <XAxis
-                                        dataKey="name"
+                                        dataKey="date"
                                         axisLine={false}
                                         tickLine={false}
                                         stroke="hsl(var(--muted-foreground))"
                                         fontSize={12}
-                                        tickFormatter={(value) => value.substring(0, 3)}
+                                    // tickFormatter={(value) => value.substring(0, 3)}
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
                                         stroke="hsl(var(--muted-foreground))"
                                         fontSize={12}
-                                        tickFormatter={(value) => value.toLocaleString()}
+                                    // tickFormatter={(value) => value.toLocaleString()}
                                     />
                                     <ChartTooltip
-                                        content={<ChartTooltipContent formatValue={(value) => `${value.toLocaleString()} sessions`} />}
+                                        content={<ChartTooltipContent
+                                            labelFormatter={(value) => {
+                                                return new Date(value).toLocaleDateString("en-US", {
+                                                    day: "numeric",
+                                                    month: "long",
+                                                    // year: "numeric",
+                                                })
+                                            }}
+                                        />}
                                     />
                                     <Bar
                                         dataKey="count"

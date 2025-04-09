@@ -2,7 +2,7 @@
 
 import { UserCheck, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, ResponsiveContainer } from "recharts"
+import { BarChart, Bar, XAxis, ResponsiveContainer, CartesianGrid } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 import { useDashboardContext } from "../context"
@@ -48,14 +48,16 @@ export function ActiveUsersCard() {
                         8%
                     </span> */}
                 </CardTitle>
-                <UserCheck className="h-4 w-4 text-slate-500" />
+                <div className="rounded-full bg-yellow-50 p-2 dark:bg-yellow-900/20">
+                    <UserCheck className="h-5 w-5 text-yellow-500" />
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="text-6xl font-bold text-slate-900">{count.toLocaleString()}</div>
                 <p className="text-xs text-slate-500 mt-1">Newly registered user accounts</p>
 
                 <div className="mt-6 h-32">
-                    <ChartContainer
+                    {/* <ChartContainer
                         config={{
                             users: {
                                 label: "Users",
@@ -65,9 +67,53 @@ export function ActiveUsersCard() {
                     >
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={userData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tickMargin={8} fontSize={12} stroke="#94a3b8" />
                                 <ChartTooltip cursor={{ fill: "hsl(var(--muted))", opacity: 0.15 }} content={<ChartTooltipContent />} />
                                 <Bar dataKey="count" name="users" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} barSize={24} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartContainer> */}
+
+                    <ChartContainer
+                        config={{
+                            completed: {
+                                label: "Users",
+                                color: "#FBBF24",
+                            },
+                        }}
+                    >
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                data={userData}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    stroke="hsl(var(--muted-foreground))"
+                                    fontSize={12}
+                                />
+                                <ChartTooltip
+                                    content={<ChartTooltipContent
+                                        labelFormatter={(value) => {
+                                            return new Date(value).toLocaleDateString("en-US", {
+                                                day: "numeric",
+                                                month: "long",
+                                                // year: "numeric",
+                                            })
+                                        }}
+                                    />}
+                                />
+                                <Bar
+                                    dataKey="count"
+                                    radius={[4, 4, 0, 0]}
+                                    fill="#FBBF24"
+                                    barSize={20}
+                                    fillOpacity={0.9}
+                                    name="active"
+                                />
                             </BarChart>
                         </ResponsiveContainer>
                     </ChartContainer>

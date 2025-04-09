@@ -2,7 +2,7 @@
 
 import { Dumbbell } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, ResponsiveContainer } from "recharts"
+import { BarChart, Bar, XAxis, ResponsiveContainer, CartesianGrid, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import useAppointments from "../hooks/use-appointments"
 import { useMemo } from "react"
@@ -47,7 +47,9 @@ export function SessionCard() {
             12%
           </span> */}
         </CardTitle>
-        <Dumbbell className="h-4 w-4 text-slate-500" />
+        <div className="rounded-full bg-orange-50 p-2 dark:bg-orange-900/20">
+          <Dumbbell className="h-5 w-5 text-orange-500" />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="text-6xl font-bold text-slate-900">{count.toLocaleString()}</div>
@@ -56,25 +58,49 @@ export function SessionCard() {
         <div className="mt-6 h-32">
           <ChartContainer
             config={{
-              sessions: {
+              completed: {
                 label: "Sessions",
-                color: "hsl(var(--chart-1))",
+                color: "hsl(142, 76%, 36%)",
               },
             }}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sessionData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tickMargin={8} fontSize={12} stroke="#94a3b8" />
-                <ChartTooltip cursor={{ fill: "hsl(var(--muted))", opacity: 0.15 }} content={<ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "long",
-                      // year: "numeric",
-                    })
-                  }}
-                />} />
-                <Bar dataKey="count" name="sessions" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} barSize={24} />
+              <BarChart
+                data={sessionData}
+              // margin={{
+              //   top: 5,
+              //   right: 5,
+              //   bottom: 5,
+              //   left: 5,
+              // }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
+                <XAxis
+                  dataKey="date"
+                  axisLine={false}
+                  tickLine={false}
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent
+                    labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "long",
+                        // year: "numeric",
+                      })
+                    }}
+                  />}
+                />
+                <Bar
+                  dataKey="count"
+                  radius={[4, 4, 0, 0]}
+                  fill="hsl(var(--primary))"
+                  barSize={20}
+                  fillOpacity={0.9}
+                  name="completed"
+                />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
