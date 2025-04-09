@@ -20,10 +20,12 @@ export interface Rating extends Models.Document {
   appointment_id: string;
 }
 
+export type AppointmentStatus = "completed" | "pending" | "cancelled" | "confirmed";
+
 export interface Appointment extends Models.Document {
   date: Date;
   price: number;
-  status: "completed" | "pending" | "cancelled" | "confirmed";
+  status: AppointmentStatus;
   notes: string;
   userProfile_id: string;
   trainerProfile_id: string;
