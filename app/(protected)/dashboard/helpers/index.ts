@@ -4,9 +4,9 @@ import { DateRangeType } from "../context";
 export const formatDate = (date: string | Date) =>
   new Date(date).toISOString().split("T")[0];
 
-export const generateDateRange = (start: Date, end:Date): string[] => {
+export const generateDateRange = (start: Date, end: Date): string[] => {
   const dates: string[] = [];
-  let currentDate = new Date(start);
+  const currentDate = new Date(start);
 
   while (currentDate <= new Date(end)) {
     dates.push(format(currentDate, "yyyy-MM-dd")); // Add date to list in 'YYYY-MM-DD' format

@@ -56,8 +56,12 @@ export async function getUsers({
   try {
     const query = [];
 
-    query.push(Query.greaterThanEqual("$createdAt", dateRange.from.toDateString()));
+    query.push(
+      Query.greaterThanEqual("$createdAt", dateRange.from.toDateString())
+    );
     query.push(Query.lessThanEqual("$createdAt", dateRange.to.toDateString()));
+    query.push(Query.notEqual("role", "admin"));
+    query.push(Query.orderDesc("$createdAt"));
 
     const data = await databases.listDocuments(
       process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,

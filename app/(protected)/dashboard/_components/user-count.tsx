@@ -5,25 +5,42 @@ import { Users } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { useDashboardContext } from "../context"
+import useUsers from "../hooks/use-users"
+import { useMemo } from "react"
 
-// Sample user count data
-const userData = [
-    {
-        name: "Trainee",
-        count: 845,
-    },
-    {
-        name: "Trainer",
-        count: 142,
-    },
-]
 
 export default function UserCountChart() {
-    // Calculate total users
-    const totalUsers = userData.reduce((sum, item) => sum + item.count, 0)
+
+    const { selectedDate } = useDashboardContext();
+
+    const users = useUsers({ dateRange: selectedDate });
+
+    const { total_count, trainees, trainers, chartData: userData } = useMemo(() => {
+        if (users.isLoading || !users.data)
+            return { total_count: 0, trainers: [], trainees: [] }
+
+
+        return {
+            total_count: users.data.length,
+            trainers: users.data.filter(user => user.role === "trainer"),
+            trainees: users.data.filter(user => user.role === "trainee"),
+            chartData: [
+                {
+                    name: "Trainee",
+                    count: users.data.filter(user => user.role === "trainee").length,
+                },
+                {
+                    name: "Trainer",
+                    count: users.data.filter(user => user.role === "trainer").length,
+                },
+            ]
+        }
+    }, [users])
 
     // Calculate trainee percentage
-    const traineePercentage = Math.round((userData[0].count / totalUsers) * 100)
+    const traineePercentage = Math.round((trainees.length / total_count) * 100)
+    const traineeRatio = trainees.length != 0 && trainers.length != 0 ? Math.round(trainees.length / trainers.length) : 0;
 
     return (
         <Card className="w-full">
@@ -43,7 +60,7 @@ export default function UserCountChart() {
                     <div className="space-y-4">
                         <div>
                             <p className="text-sm text-muted-foreground">Total Users</p>
-                            <p className="text-2xl font-bold">{totalUsers.toLocaleString()}</p>
+                            <p className="text-2xl font-bold">{total_count.toLocaleString()}</p>
                         </div>
 
                         <div className="space-y-2">
@@ -52,7 +69,7 @@ export default function UserCountChart() {
                                     <div className="h-3 w-3 rounded-full bg-purple-500"></div>
                                     <p className="text-sm font-medium">Trainees</p>
                                 </div>
-                                <p className="text-sm font-medium">{userData[0].count.toLocaleString()}</p>
+                                <p className="text-sm font-medium">{trainees.length.toLocaleString()}</p>
                             </div>
 
                             <div className="flex items-center justify-between">
@@ -60,13 +77,13 @@ export default function UserCountChart() {
                                     <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
                                     <p className="text-sm font-medium">Trainers</p>
                                 </div>
-                                <p className="text-sm font-medium">{userData[1].count.toLocaleString()}</p>
+                                <p className="text-sm font-medium">{trainers.length.toLocaleString()}</p>
                             </div>
 
                             <div className="mt-2 rounded-md bg-muted p-2">
                                 <p className="text-xs text-muted-foreground">
                                     {traineePercentage}% of users are trainees, with a trainee-to-trainer ratio of{" "}
-                                    {Math.round(userData[0].count / userData[1].count)}:1
+                                    {traineeRatio}:1
                                 </p>
                             </div>
                         </div>
@@ -111,7 +128,7 @@ export default function UserCountChart() {
                                         tickFormatter={(value) => value.toLocaleString()}
                                     />
                                     <ChartTooltip
-                                        content={<ChartTooltipContent formatValue={(value) => `${value.toLocaleString()} users`} />}
+                                        content={<ChartTooltipContent formatValue={(value: any) => `${value.toLocaleString()} users`} />}
                                     />
                                     <Bar dataKey="count" radius={[4, 4, 4, 4]} fill="var(--color-count)" barSize={20} fillOpacity={0.9} />
                                 </BarChart>
