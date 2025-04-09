@@ -88,7 +88,12 @@ export default function RevenueChart() {
                                 axisLine={false}
                                 tickFormatter={(value) => `$${value / 1000}k`}
                             />
-                            <ChartTooltip content={<ChartTooltipContent formatValue={(value) => `$${value.toLocaleString()}`} />} />
+                            <ChartTooltip content={
+                                <ChartTooltipContent
+                                // formatValue={(value) => `$${value.toLocaleString()}`}
+                                />
+                            }
+                            />
                             <Line
                                 type="monotone"
                                 dataKey="revenue"
