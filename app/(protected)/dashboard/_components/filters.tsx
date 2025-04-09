@@ -66,7 +66,7 @@ export default function AnalyticsFilters() {
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar mode="range" selected={selectedDate} onSelect={(range: any) => range && setSelectedDate(range)} initialFocus />
+                                <Calendar toDate={new Date()} mode="range" selected={selectedDate} onSelect={(range: any) => range && setSelectedDate(range)} />
                             </PopoverContent>
                         </Popover>
                     </div>

@@ -9,43 +9,33 @@ import { useMemo } from "react"
 import { Appointment } from "@/types/appwrite.types"
 import { useDashboardContext } from "../context"
 import { format } from "date-fns"
+import { generateDateRange, groupByDate } from "../helpers"
 
 export function SessionCard() {
   const { selectedDate } = useDashboardContext();
-  const appointments = useAppointments({ status: "completed", dateRange: selectedDate });
-
-  const groupByDate = (appointments: Appointment[]) => {
-    // Helper function to format date into 'YYYY-MM-DD'
-    const formatDate = (date: string | Date) => {
-      return new Date(date).toISOString().split('T')[0]; // Returns the date in 'YYYY-MM-DD' format
-    };
-
-    // Group the appointments by the formatted date
-    const grouped: Record<string, number> = appointments.reduce((acc: any, appointment) => {
-      const date = formatDate(appointment.date);
-      if (acc[date]) {
-        acc[date] += 1; // Increment the count for this date
-      } else {
-        acc[date] = 1; // Initialize count for this date
-      }
-      return acc;
-    }, {});
-
-    const groupedArray = Object.entries(grouped).map(([date, count]) => ({
-      date: format(new Date(date), "MM/dd"),
-      count,
-    }));
-
-    return groupedArray.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  };
+  const appointments = useAppointments({ status: "all", dateRange: selectedDate });
 
   const { count, data: sessionData } = useMemo(() => {
     if (appointments.isLoading || !appointments.data)
       return { count: 0, data: [] }
 
-    return { count: appointments.data.length, data: groupByDate(appointments.data) }
-  }, [appointments])
+    const start = selectedDate.from;
+    const end = selectedDate.to;
 
+    const allDates = generateDateRange(start, end); // Generate all dates in range
+    const groupedData = groupByDate(appointments?.data ?? [], (d) => d.date);
+
+    const filledData = allDates.map((date) => {
+      const formattedDate = format(new Date(date), 'MM/dd');
+      const existing = groupedData.find(item => item.date === formattedDate);
+      return existing || { date: formattedDate, count: 0 }; // Default to 0 if not found
+    });
+
+    return {
+      count: appointments.data.length,
+      data: filledData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    };
+  }, [appointments])
 
   return (
     <Card className="overflow-hidden">

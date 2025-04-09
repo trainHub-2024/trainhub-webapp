@@ -17,7 +17,7 @@ const Dashboard = () => {
                         <AnalyticsFilters />
                     </div>
                     <SessionCard />
-                    <ActiveUsersCard count={876} />
+                    <ActiveUsersCard />
                 </div>
                 <div className="col-span-4 grid grid-cols-2 gap-4">
                     <UserCountChart />

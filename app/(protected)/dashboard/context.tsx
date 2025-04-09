@@ -27,7 +27,6 @@ const DashboardContext = createContext<DashboardContextProps>({
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     const [selectedDate, setSelectedDate] = useState<DateRangeType>({ from: subDays(new Date(), 7), to: new Date() })
-
     const [shortcutDate, setShortcutDate] = useState<ShortcutDateType>("7Days");
 
     return (

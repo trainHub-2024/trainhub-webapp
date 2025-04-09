@@ -2,6 +2,8 @@ import { toast } from "sonner";
 import { accounts, databases } from "../appwrite";
 import { Query } from "appwrite";
 import { parseStringify } from "../utils";
+import { DateRangeType } from "@/app/(protected)/dashboard/context";
+import { User } from "@/types/appwrite.types";
 
 export const login = async (email: string, password: string) => {
   const session = await accounts.createEmailPasswordSession(email, password);
@@ -43,5 +45,35 @@ export async function getUserByAccountId(account_id: string) {
     const errorMessage = "An error occurred while retrieving the user details:";
     toast.error(errorMessage);
     console.error(errorMessage, error);
+  }
+}
+
+export async function getUsers({
+  dateRange,
+}: {
+  dateRange: DateRangeType;
+}): Promise<User[]> {
+  try {
+    const query = [];
+
+    query.push(Query.greaterThanEqual("$createdAt", dateRange.from.toDateString()));
+    query.push(Query.lessThanEqual("$createdAt", dateRange.to.toDateString()));
+
+    const data = await databases.listDocuments(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID!,
+      query
+    );
+
+    if (!data?.documents) {
+      return [];
+    }
+
+    return data.documents.map((d) => parseStringify(d));
+  } catch (error) {
+    const errorMessage = "An error occurred while retrieving the user details:";
+    toast.error(errorMessage);
+    console.error(errorMessage, error);
+    return [];
   }
 }
