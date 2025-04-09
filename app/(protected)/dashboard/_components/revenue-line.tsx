@@ -5,6 +5,12 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } fro
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { useDashboardContext } from "../context"
+import useAppointments from "../hooks/use-appointments"
+import { Appointment } from "@/types/appwrite.types"
+import { format } from "date-fns"
+import { useMemo } from "react"
+import { generateDateRange } from "../helpers"
 
 // Sample revenue data
 const revenueData = [
@@ -22,20 +28,76 @@ const revenueData = [
     { month: "Dec", revenue: 125000 },
 ]
 
-// Calculate percentage change from first to last month
-const percentageChange = (
-    ((revenueData[revenueData.length - 1].revenue - revenueData[0].revenue) / revenueData[0].revenue) *
-    100
-).toFixed(1)
+const calculateRevenue = (appointments: Appointment[]) => {
+    // Filter appointments with confirmed payment
+    const paidAppointments = appointments.filter(
+        (appointment) => appointment.isConfirmedPayment && appointment.status === "completed"
+    );
+
+    // Calculate total revenue
+    const totalRevenue = paidAppointments.reduce((total, appointment) => total + appointment.price, 0);
+
+    // Group by date to calculate daily revenue
+    const dailyRevenue: Record<string, number> = paidAppointments.reduce((acc: any, appointment) => {
+        const formattedDate = format(new Date(appointment.date), 'yyyy-MM-dd'); // Format date as 'YYYY-MM-DD'
+        if (!acc[formattedDate]) {
+            acc[formattedDate] = 0;
+        }
+        acc[formattedDate] += appointment.price;
+        return acc;
+    }, {});
+
+    // Convert daily revenue to array of {date, revenue} objects
+    const dailyRevenueArray = Object.entries(dailyRevenue).map(([date, revenue]) => ({
+        date,
+        revenue
+    }));
+
+
+    // Return total and daily revenue
+    return {
+        totalRevenue,
+        dailyRevenue: dailyRevenueArray.sort((a, b) => (new Date(a.date) as any) - (new Date(b.date) as any)) // Sort by date
+    };
+};
 
 export default function RevenueChart() {
+    const { selectedDate } = useDashboardContext();
+    const appointments = useAppointments({ status: "completed", dateRange: selectedDate });
+
+    const { totalRevenue, data: revenueData } = useMemo(() => {
+        if (appointments.isLoading || !appointments.data) {
+            return { totalRevenue: 0, data: [] };
+        }
+
+
+        const start = selectedDate.from;
+        const end = selectedDate.to;
+        const allDates = generateDateRange(start, end);
+
+        const { totalRevenue, dailyRevenue: groupedData } = calculateRevenue(appointments.data);
+
+        const filledData = allDates.map((date) => {
+            const formattedDate = format(new Date(date), 'MM/dd');
+            const existing = groupedData.find(item => format(item.date, 'MM/dd') === formattedDate);
+            return existing ? { date: format(existing.date, 'MM/dd'), revenue: existing.revenue } : { date: formattedDate, revenue: 0 }; // Default to 0 if not found
+        });
+
+
+        return {
+            totalRevenue,
+            data: filledData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        }; // Calculate revenue
+    }, [appointments]);
+
+
     return (
         <Card className="w-full">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div>
                         <CardTitle className="text-xl font-bold">Revenue Overview</CardTitle>
-                        <CardDescription>Monthly revenue performance for the current year</CardDescription>
+                        <CardDescription>Daily revenue performance</CardDescription>
                     </div>
                     <div className="rounded-full bg-emerald-50 p-2 dark:bg-emerald-900/20">
                         <DollarSign className="h-5 w-5 text-emerald-500" />
@@ -46,13 +108,13 @@ export default function RevenueChart() {
                 <div className="flex items-center justify-between pb-4">
                     <div>
                         <p className="text-sm text-muted-foreground">Total Annual Revenue</p>
-                        <p className="text-2xl font-bold">$922,000</p>
+                        <p className="text-2xl font-bold">{totalRevenue.toLocaleString()}</p>
                     </div>
-                    <div className="flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-500 dark:bg-emerald-900/20">
+                    {/* <div className="flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-500 dark:bg-emerald-900/20">
                         <TrendingUp className="h-3.5 w-3.5" />
                         <span>{percentageChange}%</span>
                         <ArrowUpRight className="h-3.5 w-3.5" />
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="w-full pt-2">
@@ -75,7 +137,7 @@ export default function RevenueChart() {
                         >
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                             <XAxis
-                                dataKey="month"
+                                dataKey="date"
                                 stroke="hsl(var(--muted-foreground))"
                                 fontSize={12}
                                 tickLine={false}
