@@ -19,6 +19,8 @@ export async function getAppointments({
 
     query.push(Query.greaterThanEqual("date", dateRange.from.toDateString()));
     query.push(Query.lessThanEqual("date", dateRange.to.toDateString()));
+    query.push(Query.orderDesc("date"));
+
 
     if (status != "all") {
       query.push(Query.equal("status", status));

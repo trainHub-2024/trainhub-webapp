@@ -43,6 +43,9 @@ export interface Appointment extends Models.Document {
   userProfile: UserProfile;
   trainerProfile: UserProfile;
 
+  timeSlot: string;
+  duration: number;
+
   rating?: Rating;
 }
 
