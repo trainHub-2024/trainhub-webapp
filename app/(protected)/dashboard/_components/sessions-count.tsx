@@ -35,7 +35,7 @@ export function SessionCard() {
       count: appointments.data.length,
       data: filledData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     };
-  }, [appointments])
+  }, [appointments, selectedDate])
 
   return (
     <Card className="overflow-hidden">

@@ -36,7 +36,7 @@ export function ActiveUsersCard() {
             count: users.data.length,
             data: filledData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         };
-    }, [users])
+    }, [users, selectedDate])
 
     return (
         <Card className="overflow-hidden">
@@ -112,7 +112,7 @@ export function ActiveUsersCard() {
                                     fill="#FBBF24"
                                     barSize={20}
                                     fillOpacity={0.9}
-                                    name="active"
+                                    name="Active"
                                 />
                             </BarChart>
                         </ResponsiveContainer>

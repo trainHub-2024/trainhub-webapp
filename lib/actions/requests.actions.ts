@@ -3,19 +3,36 @@ import { databases } from "../appwrite";
 import { parseStringify } from "../utils";
 import { toast } from "sonner";
 import { getProfileById, updateProfileById } from "./profile.actions";
+import { DateRangeType } from "@/app/(protected)/dashboard/context";
+import { Query } from "appwrite";
 
-export async function getAdminRequests(): Promise<AdminRequest[]> {
+export async function getAdminRequests({
+  dateRange,
+}: {
+  dateRange?: DateRangeType;
+}): Promise<AdminRequest[]> {
   try {
+    const query = [];
+    query.push(Query.orderDesc("$createdAt"));
+
+    if (dateRange) {
+      query.push(
+        Query.greaterThanEqual("$createdAt", dateRange.from.toDateString())
+      );
+      query.push(
+        Query.lessThanEqual("$createdAt", dateRange.to.toDateString())
+      );
+    }
+
     const data = await databases.listDocuments(
       process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ADMIN_REQUEST_COLLECTION_ID!
+      process.env.NEXT_PUBLIC_APPWRITE_ADMIN_REQUEST_COLLECTION_ID!,
+      query
     );
 
     if (!data?.documents) {
       return [];
     }
-
-    console.log(data);
 
     // Fetch trainer profiles for requests that have trainerProfile_id
     const adminRequests = await Promise.all(
@@ -65,7 +82,7 @@ export async function updateAdminRequestStatus({
   id: string;
   trainer_id: string;
   status: "denied" | "completed";
-  type: "certification" | "report" | "appeal";
+  type: "certification" | "report" | "appeal" | "sport";
 }): Promise<AdminRequest | null> {
   try {
     const data = await databases.updateDocument(

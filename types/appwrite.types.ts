@@ -20,7 +20,11 @@ export interface Rating extends Models.Document {
   appointment_id: string;
 }
 
-export type AppointmentStatus = "completed" | "pending" | "cancelled" | "confirmed";
+export type AppointmentStatus =
+  | "completed"
+  | "pending"
+  | "cancelled"
+  | "confirmed";
 
 export interface Appointment extends Models.Document {
   date: Date;
@@ -85,12 +89,14 @@ export interface UserProfile extends Models.Document {
   ratings: Rating[];
 }
 
+export type AdminRequestStatus = "pending" | "denied" | "completed";
+
 export interface AdminRequest extends Models.Document {
   trainerProfile_id: string;
-  type: "certification" | "report" | "appeal";
+  type: "certification" | "report" | "appeal" | "sport";
   certification: any;
   text: string;
-  status: "pending" | "denied" | "completed";
+  status: AdminRequestStatus;
 
   trainerProfile: TrainerProfile;
 }
