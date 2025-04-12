@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { FormEvent, useEffect, useRef, useState } from "react"
 import { CalendarIcon, ChevronDown, Clock, Filter, LayoutGrid, LineChart, Users } from "lucide-react"
 import { format } from "date-fns"
 
@@ -17,14 +17,47 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { Input } from "@/components/ui/input"
 import { useDashboardContext } from "../context"
+import useCommission from "../hooks/use-commision"
+import { toast } from "sonner"
+import { updateCommission } from "@/lib/actions/commission.actions"
 
 export default function AnalyticsFilters() {
     const { selectedDate, setSelectedDate, setShortcutDate, shortcutDate } = useDashboardContext();
 
     const [commissionRate, setCommissionRate] = useState(10)
 
+    const commission = useCommission();
+
+    const initialized = useRef(false);
+
+    useEffect(() => {
+        if (!initialized.current && commission.data && commission.data.length > 0) {
+            setCommissionRate(commission.data[0].rate);
+            initialized.current = true;
+        }
+    }, [commission])
+
+
     const handleCommissionChange = (value: number[]) => {
         setCommissionRate(value[0])
+    }
+
+    async function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        if (!commission?.data || commission.data?.length <= 0) return null;
+
+        try {
+            toast("Updating commission please wait!");
+
+            const res = await updateCommission({ id: commission.data[0].$id, body: { rate: commissionRate } });
+            if (res) {
+                toast("Successfully Updated Commission!");
+                window.location.reload();
+            }
+        } catch (error) {
+            toast.error("An error occured");
+            console.log(error);
+        }
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,10 +75,6 @@ export default function AnalyticsFilters() {
                         <CardTitle className="text-xl font-bold">Analytics Overview</CardTitle>
                         <CardDescription>Customize your analytics view with filters and date ranges</CardDescription>
                     </div>
-                    <Button variant="outline" size="sm" className="gap-1.5">
-                        <Filter className="h-3.5 w-3.5" />
-                        <span>Reset Filters</span>
-                    </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -97,11 +126,13 @@ export default function AnalyticsFilters() {
                     <div className="rounded-md bg-muted p-2">
                         <p className="text-xs text-muted-foreground flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
-                            Last updated: April 17, 2023 at 10:30 AM
+                            Last updated: {commission?.data && commission?.data.length > 0 && (
+                                new Date(commission.data[0].$updatedAt).toLocaleString()
+                            )}
                         </p>
                     </div>
                 </div>
-                <form className="w-full sm:w-64 space-y-2">
+                <form onSubmit={handleSubmit} className="w-full sm:w-64 space-y-2">
                     <h3 className="text-sm font-medium">Adjust Commission Rate</h3>
                     <div className="flex items-center gap-2 w-full">
                         <Slider

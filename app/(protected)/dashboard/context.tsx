@@ -1,6 +1,6 @@
 "use client"
-import { subDays } from "date-fns"
-import { createContext, ReactNode, useContext, useState } from "react"
+import { subDays, subMonths } from "date-fns"
+import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 
 export type DateRangeType = {
     from: Date
@@ -28,6 +28,16 @@ const DashboardContext = createContext<DashboardContextProps>({
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     const [selectedDate, setSelectedDate] = useState<DateRangeType>({ from: subDays(new Date(), 7), to: new Date() })
     const [shortcutDate, setShortcutDate] = useState<ShortcutDateType>("7Days");
+
+    useEffect(() => {
+        if (shortcutDate === "7Days") {
+            setSelectedDate({ from: subDays(new Date(), 7), to: new Date() })
+        } else if (shortcutDate === "1Month") {
+            setSelectedDate({ from: subMonths(new Date(), 1), to: new Date() })
+        } else if (shortcutDate === "3Month") {
+            setSelectedDate({ from: subMonths(new Date(), 3), to: new Date() })
+        }
+    }, [shortcutDate])
 
     return (
         <DashboardContext.Provider value={{ selectedDate, setSelectedDate, shortcutDate, setShortcutDate }}>

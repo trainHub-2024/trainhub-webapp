@@ -49,6 +49,10 @@ export interface Appointment extends Models.Document {
   rating?: Rating;
 }
 
+export interface Commission extends Models.Document {
+  rate: number;
+}
+
 export interface TrainerProfile extends Models.Document {
   contactNumber: string;
   gender: string;

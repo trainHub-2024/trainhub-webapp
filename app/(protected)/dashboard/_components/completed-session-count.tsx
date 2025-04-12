@@ -52,7 +52,7 @@ export default function CompletedSessionCountCard() {
             maxSessionDate
         };
 
-    }, [appointments])
+    }, [appointments, selectedDate])
 
     // Calculate daily average
     const dailyAverage = Math.round(count / sessionData.length)

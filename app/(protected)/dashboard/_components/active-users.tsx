@@ -41,7 +41,7 @@ export function ActiveUsersCard() {
     return (
         <Card className="overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
                     <span className="text-slate-800">New Users</span>
                     {/* <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-normal flex items-center">
                         <TrendingUp className="h-3 w-3 mr-1" />
