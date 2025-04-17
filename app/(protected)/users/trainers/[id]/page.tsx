@@ -24,6 +24,8 @@ const TrainerPage = ({ params }: IPageProps) => {
         params: { role: "trainer", id }
     });
 
+    console.log(trainer)
+
     const rating = useMemo(() => {
         if (!trainer?.ratings || trainer.ratings.length === 0) return 0;
 
@@ -131,7 +133,7 @@ const TrainerPage = ({ params }: IPageProps) => {
                         <div className="size-40 overflow-hidden rounded-md border relative">
                             {trainer?.qrCodePayment && (
                                 <Image
-                                    src={trainer?.size}
+                                    src={trainer?.qrCodePayment}
                                     alt='qrCode'
                                     fill className='object-cover object-center'
                                 />
